@@ -13,18 +13,35 @@ This will ensure two things:
 2. Always have some recon running in the background. 
 
 Once initial ports are found '*in 5-10 seconds*', we can start manually looking into those ports, and let the rest run in the background with no interaction from our side whatsoever.  
-  
-  
-## Features:
-1. **Quick:** Shows all open ports quickly (~15 seconds)  
-2. **Basic:** Runs Quick Scan, then runs a more thorough scan on found ports (~5 minutes)  
-3. **UDP:** Runs "Basic" on UDP ports (~5 minutes)  
-4. **Full:** Runs a full range port scan, then runs a thorough scan on new ports (~5-10 minutes)  
-5. **Vulns:** Runs CVE scan and nmap Vulns scan on all found ports (~5-15 minutes)  
-6. **Recon:** Runs "Basic" scan "if not yet run", then suggests recon commands "i.e. gobuster, nikto, smbmap" based on the found ports, then prompts to automatically run them  
-7. **All:** Runs all the scans consecutively (~20-30 minutes)  
 
-  -----
+## Features
+
+### Scans
+1. **Network:** Shows all live hosts in the host's network (~15 seconds)
+2. **Quick:** Shows all open ports quickly (~15 seconds)  
+3. **Basic:** Runs Quick Scan, then runs a more thorough scan on found ports (~5 minutes)  
+4. **UDP:** Runs "Basic" on UDP ports (~5 minutes)  
+5. **Full:** Runs a full range port scan, then runs a thorough scan on new ports (~5-10 minutes)  
+6. **Vulns:** Runs CVE scan and nmap Vulns scan on all found ports (~5-15 minutes)  
+7. **Recon:** Runs popular recon tools on found ports
+8. **All:** Runs all the scans sequentially (~20-30 minutes)  
+
+*Note: This is a reconnaissance tool, and it does not perform any exploitation.*
+
+### Automatic Recon
+With the `recon` option, nmapAutomator will automatically recommend and run the best recon tools for each found port.  
+If a recommended tool is missing from your machine, nmapAutomator will suggest how to install it.
+
+### Runs on any shell
+nmapAutomator is 100% POSIX compatible, so it can run on any `sh` shell, and on any unix-based machine (*even a 10 YO router!*), which makes nmapAutomator ideal for lateral movement recon.
+
+If you want to run nmapAutomator on a remote machine, simply download a static nmap executable from [this link](https://github.com/andrew-d/static-binaries/raw/master/binaries/linux/x86_64/nmap), or with [static-get](https://github.com/minos-org/minos-static), and transfer it to the remote machine. You can then use `-s/--static-nmap` to specify the path to the static nmap executable.
+
+### Output
+nmapAutomator saves the output of each type of scan is saved into a separate file, under the output directory.  
+The entire script output is also saved, which you can view with `less -r outputDir/nmapAutomator_host_type.txt`, or you can simply `cat` it.
+
+-----
   
 ## Requirements:
 [ffuf](https://github.com/ffuf/ffuf), which we can install with:
@@ -60,9 +77,10 @@ sudo ln -s $(pwd)/nmapAutomator/nmapAutomator.sh /usr/local/bin/
 ## Usage:
 ```
 ./nmapAutomator.sh -h
-Usage: ./nmapAutomator.sh -H/--host <TARGET-IP> -t/--type <TYPE> [-d/--dns <DNS SERVER> -o/--output <OUTPUT DIRECTORY>]
+Usage: /usr/local/bin/nmapAutomator.sh -H/--host <TARGET-IP> -t/--type <TYPE> [-d/--dns <DNS SERVER> -o/--output <OUTPUT DIRECTORY> -s/--static-nmap <STATIC NMAP PATH>]
 
 Scan Types:
+	Network: Shows all live hosts in the host's network (~15 seconds)
 	Quick: Shows all open ports quickly (~15 seconds)
 	Basic: Runs Quick Scan, then runs a more thorough scan on found ports (~5 minutes)
 	UDP  : Runs "Basic" on UDP ports "requires sudo" (~5 minutes)
@@ -77,16 +95,12 @@ Scan Types:
 ./nmapAutomator.sh --host 10.1.1.1 --type All
 ./nmapAutomator.sh -H 10.1.1.1 -t Basic
 ./nmapAutomator.sh -H academy.htb -t Recon -d 1.1.1.1
+./nmapAutomator.sh -H 10.10.10.10 -t network -s ./nmap
 ```
-
-**Output**:  
-The output of each type of scan is saved into a separate file, under the output directory.  
-The entire script output is also saved, which you can view with `less -r outputDir/nmapAutomator_host_type.txt`, or you can simply `cat` it.
 
 ------
 
-## TODO list
-**Feel free to send your pull requests :)**
+## Upcoming Features
 - [x] Support URL/DNS - Thanks @KatsuragiCSL
 - [x] Add extensions fuzzing for http recon
 - [x] Add an nmap progress bar
@@ -94,9 +108,12 @@ The entire script output is also saved, which you can view with `less -r outputD
 - [x] Add option to change output folder
 - [x] Save full script output to a file
 - [x] Improve performance and efficiency of the script - Thanks @caribpa
-- [ ] Add remote mode, which uses bash only without any external tools (for lateral movement in a network)
+- [x] Make nmapAutomater 100% POSIX compatible. - Massive Thanks to @caribpa
+- [x] Add network scanning type, so nmapAutomator can discover live hosts on the network.
+- [ ] Enable usage of multiple scan types in one scan.
+- [ ] Enable scanning of multiple hosts in one scan.
+- [ ] Add remote mode, which uses POSIX commands only without nmap or any external tools.
 
 
-## Add more recon options
-- If you would like to suggest or add more port-based recon options, you can base your pull request on the [following lines](https://github.com/21y4d/nmapAutomator/blob/17377bb42e0b2e99bd7d4b20efc878a0a0051025/nmapAutomator.sh#L422-L428).
-- If you would like to suggest more options for an existing port, you can add the new command under its port, similar to this [example line](https://github.com/21y4d/nmapAutomator/blob/17377bb42e0b2e99bd7d4b20efc878a0a0051025/nmapAutomator.sh#L447).
+**Feel free to send your pull requests :)**  
+*For any pull requests, please try to follow these [Contributing Guidelines](CONTRIBUTING.md).*
